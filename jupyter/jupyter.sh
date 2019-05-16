@@ -36,14 +36,6 @@ if [[ -f /etc/profile.d/effective-python.sh ]]; then
   source /etc/profile.d/effective-python.sh
 fi
 
-# Install jupyter on all nodes to start with a consistent python environment
-# on all nodes. Also, pin the python version to ensure that conda does not
-# update python because the latest version of jupyter supports a higher version
-# than the one already installed. See issue #300 for more information.
-PYTHON="$(ls /opt/conda/bin/python || which python)"
-PYTHON_VERSION="$(${PYTHON} --version 2>&1 | cut -d ' ' -f 2)"
-conda install jupyter matplotlib "python==${PYTHON_VERSION}"
-
 conda install 'testpath<0.4'
 
 if [ -n "${JUPYTER_CONDA_CHANNELS}" ]; then
@@ -63,10 +55,15 @@ if [ -n "${JUPYTER_CONDA_PACKAGES}" ]; then
   conda install ${JUPYTER_CONDA_PACKAGES//:/ }
 fi
 
-# For storing notebooks on GCS. Pin version to make this script hermetic.
-pip install jgscm==0.1.7
-
 if [[ "${ROLE}" == 'Master' ]]; then
+  # Pin to same Python version as other nodes
+  PYTHON="$(ls /opt/conda/bin/python || which python)"
+  PYTHON_VERSION="$(${PYTHON} --version 2>&1 | cut -d ' ' -f 2)"
+  conda install jupyter matplotlib "python==${PYTHON_VERSION}"
+
+  # For storing notebooks on GCS. Pin version to make this script hermetic.
+  pip install jgscm==0.1.7
+
   ./dataproc-initialization-actions/jupyter/internal/setup-jupyter-kernel.sh
   ./dataproc-initialization-actions/jupyter/internal/launch-jupyter-kernel.sh
 fi
