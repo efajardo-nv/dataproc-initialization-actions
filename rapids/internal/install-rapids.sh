@@ -2,7 +2,7 @@
 
 apt install libopenblas-base libomp-dev
 
-readonly CONDA_ENV_YAML_PATH="/root/dataproc-initialization-actions/rapids/internal/conda-environment.yml"
+readonly CONDA_ENV_YAML_PATH="./dataproc-initialization-actions/rapids/internal/conda-environment.yml"
 
 gsutil -m cp -r gs://dataproc-initialization-actions/conda/bootstrap-conda.sh .
 gsutil -m cp -r gs://dataproc-initialization-actions/conda/install-conda-env.sh .
